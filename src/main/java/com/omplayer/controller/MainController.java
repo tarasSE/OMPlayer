@@ -35,9 +35,13 @@ public class MainController implements Initializable {
     @FXML
     private Button nextItem;
     @FXML
+    private Button prevItem;
+    @FXML
     private Button volumeMinus;
     @FXML
     private Button volumePlus;
+    @FXML
+    private Button repeat;
     @FXML
     private Slider timeSlider;
     @FXML
@@ -50,9 +54,13 @@ public class MainController implements Initializable {
     private ListView<Item> itemsList;
     private int currentIndex;
 
+    private Repeat repeatStatus = Repeat.NOT;
     private ChangeListener<Duration> progressChangeListener;
     private MapChangeListener<String, Object> metadataChangeListener;
 
+    enum Repeat{
+        NOT, ONE, ALL
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -81,7 +89,44 @@ public class MainController implements Initializable {
 
     @FXML
     private void playNextItem() {
-        itemsList.getSelectionModel().select(++currentIndex);
+        playItemOnStep(1);
+    }
+
+    @FXML
+    private void playPreviousItem() {
+        playItemOnStep(-1);
+    }
+
+    @FXML
+    private void toggleRepeat() {
+        repeat.setOnAction(event -> {
+            int i = repeatStatus.ordinal() + 1;
+            switch (i % 3 == 0 ? i = 0 : i ){
+                case 0 :
+                    setRepeatStatus(Repeat.NOT);
+                    repeat.setText("not");
+                    break;
+                case 1 :
+                    repeat.setText("one");
+                    setRepeatStatus(Repeat.ONE);
+                    break;
+                case 2 :
+                    repeat.setText("all");
+                    setRepeatStatus(Repeat.ALL);
+                    break;
+                default:
+                    repeat.setText("n");
+                    setRepeatStatus(Repeat.NOT);
+            }
+
+        });
+    }
+
+    private void playItemOnStep(int i) {
+        if (currentIndex + i >= 0) {
+            setCurrentIndex(currentIndex + i);
+        }
+        itemsList.getSelectionModel().select((currentIndex));
         Item item = itemsList.getSelectionModel().getSelectedItem();
         player.stop();
         player = getPlayerInstance(item.getUrl());
@@ -126,7 +171,7 @@ public class MainController implements Initializable {
         player.setOnEndOfMedia(this::playNextItem);
     }
 
-    private void stop(){
+    private void stop() {
         player.stop();
         player.seek(new Duration(0));
     }
