@@ -54,7 +54,6 @@ public class MainController implements Initializable {
     private MapChangeListener<String, Object> metadataChangeListener;
 
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         assert playPause != null : "fx:id=\"playPause\" was not injected: check your FXML file 'player.fxml'.";
@@ -81,12 +80,12 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void playNextItem(){
+    private void playNextItem() {
         itemsList.getSelectionModel().select(++currentIndex);
         Item item = itemsList.getSelectionModel().getSelectedItem();
         player.stop();
         player = getPlayerInstance(item.getUrl());
-        player.play();
+        play();
     }
 
     @FXML
@@ -117,10 +116,19 @@ public class MainController implements Initializable {
                 currentIndex = itemsList.getSelectionModel().getSelectedIndex();
                 player.stop();
                 player = getPlayerInstance(item.getUrl());
-                player.play();
-                player.setOnEndOfMedia(this::playNextItem);
+                play();
             }
         });
+    }
+
+    private void play() {
+        player.play();
+        player.setOnEndOfMedia(this::playNextItem);
+    }
+
+    private void stop(){
+        player.stop();
+        player.seek(new Duration(0));
     }
 
     private void initializePlayPauseButton() {
@@ -128,12 +136,9 @@ public class MainController implements Initializable {
             MediaPlayer.Status status = player.statusProperty().getValue();
             if (status.equals(MediaPlayer.Status.PLAYING)) {
                 player.pause();
-            } else if (status.equals(MediaPlayer.Status.PAUSED) || status.equals(MediaPlayer.Status.STOPPED)){
-                player.play();
-//                player.setOnEndOfMedia(this::playNextItem);
-                player.setOnEndOfMedia(this::playNextItem);
-            }
-            else {
+            } else if (status.equals(MediaPlayer.Status.PAUSED) || status.equals(MediaPlayer.Status.STOPPED)) {
+                play();
+            } else {
                 setCurrentIndex(-1);
                 playNextItem();
             }
@@ -143,7 +148,7 @@ public class MainController implements Initializable {
     }
 
     private void initializeStopButton() {
-        stop.setOnAction(actionEvent -> player.stop());
+        stop.setOnAction(actionEvent -> stop());
     }
 
     private void initializeBackButton() {
