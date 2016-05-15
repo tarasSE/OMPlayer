@@ -14,7 +14,7 @@ public class MediaParser {
     private Pattern imgPattern;
     private Pattern mp3Pattern;
 
-    public Set<String> getIMG(final String address) {
+    public Set<Item> getIMG(final String address) {
         return getSMTH(address, getIMGPattern());
     }
 
@@ -22,7 +22,7 @@ public class MediaParser {
         downloadSMTH(address, getIMGPattern(), "pictures");
     }
 
-    public Set<String> getMP3(final String address) {
+    public Set<Item> getMP3(final String address) {
 
         return getSMTH(address, getMP3Pattern());
     }
@@ -31,8 +31,8 @@ public class MediaParser {
         downloadSMTH(address, getMP3Pattern(), "mp3");
     }
 
-    public Set<String> getSMTH(final String address, final Pattern pattern) {
-        Set<String> smth = new TreeSet<>();
+    public Set<Item> getSMTH(final String address, final Pattern pattern) {
+        Set<Item> smth = new TreeSet<>();
         URL url = null;
 
         try {
@@ -52,7 +52,10 @@ public class MediaParser {
 
                 if (matcher.find()) {
 //                    System.out.println(x);
-                    smth.add(matcher.group(2));
+                    Item item  = new Item();
+                    item.setUrl(matcher.group(2));
+                    item.setShortName(item.getUrl().substring(item.getUrl().lastIndexOf("/")));
+                    smth.add(item);
                 }
             });
 
@@ -66,11 +69,11 @@ public class MediaParser {
     public void downloadSMTH(String address, Pattern pattern, String itemsType) {
         getSMTH(address, pattern).forEach(x -> {
             try {
-                InputStream is = new URL(x).openStream();
+                InputStream is = new URL(x.getUrl()).openStream();
 
                 File dirs = new File("./" + itemsType + "/");
                 dirs.mkdirs();
-                File file = new File(dirs.getPath() + x.substring(x.lastIndexOf("/"), x.length()));
+                File file = new File(dirs.getPath() + x.getShortName());
                 System.out.print(file.getName() + " - ");
 
                 OutputStream writer = new FileOutputStream(file);

@@ -10,7 +10,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 
 public class Player extends Application {
@@ -25,9 +24,9 @@ public class Player extends Application {
         Group root = new Group();
         Scene scene = new Scene(root, 500, 200);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(Player.class.getResource("player.fxml"));
+//        FXMLLoader fxmlLoader = new FXMLLoader(Player.class.getResource("player.fxml"));
 
-        Media pick = new Media(new File("/home/taras/IdeaProjects/NEH/02-КтоТы.mp3").toURI().toString());
+        Media pick = new Media("http://storage.mp3.cc/listen/222384/TUF1TmhicGxwQk5SdTJKNXF3VXl2cm00NjdQelhRNDFXNlcvNHIya0drK2VEUzFhakw3Q3FnbUpZVlBXaTJFQkhxNkVGM2s0SlA1Z1lBN2NEVzBjWUI3U0p5U00rUnFmczFSVGs0eERRNTVIYVJQTXg3eUFsYnQ5Q1lXSE1PU2k/Kipelov-09_Kipelov_-Zakat_(mp3.cc).mp3");
         player = new MediaPlayer(pick);
 //        player.play();
 
@@ -50,6 +49,7 @@ public class Player extends Application {
 
             // Отображаем сцену, содержащую корневой макет.
             Scene scene = new Scene(rootLayout);
+            primaryStage.setTitle("OMPlayer");
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (IOException e) {
@@ -61,6 +61,9 @@ public class Player extends Application {
         return player;
     }
 
+    public static void setPlayer(MediaPlayer player) {
+        Player.player = player;
+    }
 
     public static void main(String[] args) {
         launch(args);
