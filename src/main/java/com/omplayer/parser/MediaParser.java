@@ -54,7 +54,7 @@ public class MediaParser {
 //                    System.out.println(x);
                     Item item  = new Item();
                     item.setUrl(matcher.group(2));
-                    item.setShortName(item.getUrl().substring(item.getUrl().lastIndexOf("/")));
+                    item.setShortName(item.getUrl().substring(item.getUrl().lastIndexOf("/")+1));
                     smth.add(item);
                 }
             });
@@ -110,13 +110,6 @@ public class MediaParser {
         return mp3Pattern;
     }
 
-//    public static void main(String[] args) throws Exception {
-//        MediaParser mediaParser = new MediaParser();
-//        mediaParser.downloadIMG("https://www.pinterest.com/categories/humor/");
-//
-////        mediaParser.downloadMP3("http://mp3.cc/search/f/" + URLEncoder.encode("кипелов я здесь", "UTF-8"));
-//
-//    }
 }
 
 

@@ -9,11 +9,16 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class Player extends Application {
-    private Stage primaryStage;
+    private static Stage primaryStage;
     private AnchorPane rootLayout;
     private static MediaPlayer player;
 
@@ -26,7 +31,12 @@ public class Player extends Application {
 
 //        FXMLLoader fxmlLoader = new FXMLLoader(Player.class.getResource("player.fxml"));
 
-        Media pick = new Media("http://storage.mp3.cc/listen/222384/TUF1TmhicGxwQk5SdTJKNXF3VXl2cm00NjdQelhRNDFXNlcvNHIya0drK2VEUzFhakw3Q3FnbUpZVlBXaTJFQkhxNkVGM2s0SlA1Z1lBN2NEVzBjWUI3U0p5U00rUnFmczFSVGs0eERRNTVIYVJQTXg3eUFsYnQ5Q1lXSE1PU2k/Kipelov-09_Kipelov_-Zakat_(mp3.cc).mp3");
+        Media pick = null;
+        try {
+            pick = new Media(Player.class.getResource("/smth.mp3").toURI().toString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         player = new MediaPlayer(pick);
 //        player.play();
 
@@ -63,6 +73,10 @@ public class Player extends Application {
 
     public static void setPlayer(MediaPlayer player) {
         Player.player = player;
+    }
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
     }
 
     public static void main(String[] args) {
