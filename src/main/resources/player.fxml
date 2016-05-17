@@ -6,30 +6,56 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="434.0" prefWidth="450.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.omplayer.controller.PlayerController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="442.0" prefWidth="450.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.omplayer.controller.PlayerController">
   <children>
-    <TextField fx:id="searchField" layoutX="16.0" layoutY="14.0" onAction="#initializeSearchField" prefWidth="420.0" />
-    <Label fx:id="info" alignment="TOP_LEFT" layoutX="18.0" layoutY="42.0" prefHeight="36.0" prefWidth="418.0" text="" />
-    <!--<Slider fx:id="timeSlider" layoutX="17.0" layoutY="128.0" prefWidth="420.0" />-->
-    <Button fx:id="prevItem" layoutX="19.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#playPreviousItem" prefWidth="38.999900000002526" text="◀▮">
+    <TextField fx:id="searchField" editable="true" layoutX="16.0" layoutY="14.0" onAction="#initializeSearchField" opacity="1.0" prefWidth="420.0" />
+    <Label fx:id="infoLabel" alignment="TOP_LEFT" layoutX="18.0" layoutY="42.0" prefHeight="22.0" prefWidth="418.0" text="">
       <font>
         <Font size="10.0" fx:id="x2" />
       </font>
-    </Button>
-    <Button fx:id="back" font="$x2" layoutX="58.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="◀◀" />
-    <Button fx:id="playPause" font="$x2" layoutX="97.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="▶" />
-    <Button fx:id="stop" font="$x2" layoutX="136.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="◼" />
-    <Button fx:id="forward" font="$x2" layoutX="175.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="▶▶" />
-    <Button fx:id="nextItem" font="$x2" layoutX="214.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#playNextItem" prefWidth="39.0" text="▮▶" />
-    <Button fx:id="repeat" font="$x2" layoutX="253.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#toggleRepeat" prefHeight="17.0" prefWidth="39.0" text="not" />
-    <Button fx:id="volumeMinus" layoutX="302.0" layoutY="100.0" minHeight="15.999900000002526" minWidth="20.0" mnemonicParsing="false" prefHeight="16.000099999997474" prefWidth="26.0" text="-">
+    </Label>
+    <!--<Slider fx:id="timeSlider" layoutX="17.0" layoutY="128.0" prefWidth="420.0" />-->
+    <Button fx:id="prevItemButton" font="$x2" layoutX="19.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#playPreviousItem" prefWidth="39.0" text="◀▮" />
+    <Button fx:id="backButton" font="$x2" layoutX="58.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="◀◀" />
+    <Button fx:id="playPauseButton" font="$x2" layoutX="97.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="▶" />
+    <Button fx:id="stopButton" font="$x2" layoutX="136.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="◼" />
+    <Button fx:id="forwardButton" font="$x2" layoutX="175.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="▶▶" />
+    <Button fx:id="nextItemButton" font="$x2" layoutX="214.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#playNextItem" prefWidth="39.0" text="▮▶" />
+    <Button fx:id="repeatButton" font="$x2" layoutX="253.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#toggleRepeat" prefHeight="17.0" prefWidth="39.0" text="not" />
+    <Button fx:id="volumeMinusButton" layoutX="302.0" layoutY="100.0" minHeight="16.0" minWidth="20.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="26.0" text="-">
       <font>
         <Font size="8.0" fx:id="x1" />
       </font>
     </Button>
-    <Button fx:id="volumePlus" font="$x1" layoutX="410.0" layoutY="101.0" minHeight="16.0" minWidth="24.0" mnemonicParsing="false" prefHeight="16.0" prefWidth="24.0" text="+" />
-    <Slider fx:id="volumeSlider" blockIncrement="0.1" layoutX="328.0" layoutY="101.0" max="1.0" minHeight="6.0" prefHeight="15.999900000002526" prefWidth="82.0" value="1.0" />
-    <ListView fx:id="itemsList" blendMode="DARKEN" editable="true" layoutX="18.0" layoutY="138.0" prefHeight="282.0" prefWidth="418.0" />
-    <ProgressBar fx:id="timeProgress" layoutX="20.0" layoutY="70.0" minHeight="5.0" prefHeight="15.999900000002526" prefWidth="415.0" progress="0.0" />
+    <Button fx:id="volumePlusButton" font="$x1" layoutX="410.0" layoutY="101.0" minHeight="16.0" minWidth="24.0" mnemonicParsing="false" prefHeight="16.0" prefWidth="24.0" text="+" />
+    <Slider fx:id="volumeSlider" blockIncrement="0.1" layoutX="328.0" layoutY="101.0" max="1.0" minHeight="6.0" prefHeight="16.0" prefWidth="82.0" value="1.0" />
+    <ProgressBar fx:id="timeProgressBar" layoutX="20.0" layoutY="70.0" minHeight="5.0" prefHeight="16.0" prefWidth="415.0" progress="0.0" />
+    <TabPane layoutX="18.0" layoutY="133.0" prefHeight="295.0" prefWidth="415.0" tabClosingPolicy="UNAVAILABLE">
+      <tabs>
+        <Tab text="Results">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="252.0" prefWidth="415.0">
+              <children>
+                <ListView fx:id="itemsList" blendMode="DARKEN" editable="true" prefHeight="230.0" prefWidth="415.0" AnchorPane.bottomAnchor="29.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                <Button fx:id="addToFavorites" layoutX="286.0" layoutY="235.0" mnemonicParsing="false" text="Add to Favorites" />
+                <Button fx:id="clearResultButton" layoutX="230.0" layoutY="235.0" mnemonicParsing="false" onAction="#clearResult" text="Clear" />
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab text="Favorites">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <ListView id="favoriteItems" fx:id="favoriteItemsListView" prefHeight="228.0" prefWidth="415.0" AnchorPane.bottomAnchor="31.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                <Button id="removeFromFavorites" fx:id="removeFromFavoritesButton" layoutX="339.0" layoutY="235.0" mnemonicParsing="false" text="Remove" />
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+      </tabs>
+    </TabPane>
+    <Label fx:id="currentTimeLabel" font="$x2" layoutX="29.0" layoutY="71.0" minHeight="14.0" prefHeight="14.0" text="00:00" textAlignment="CENTER" />
+    <Label fx:id="totalTimeLabel" font="$x2" layoutX="405.0" layoutY="70.0" minHeight="14.0" prefHeight="14.0" text="00:00" />
   </children>
 </AnchorPane>
