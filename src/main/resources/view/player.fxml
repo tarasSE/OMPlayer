@@ -21,7 +21,7 @@
     <Button fx:id="stopButton" font="$x2" layoutX="136.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="◼" />
     <Button fx:id="forwardButton" font="$x2" layoutX="175.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" prefWidth="39.0" text="▶▶" />
     <Button fx:id="nextItemButton" font="$x2" layoutX="214.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#playNextItem" prefWidth="39.0" text="▮▶" />
-    <Button fx:id="repeatButton" font="$x2" layoutX="253.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#toggleRepeat" prefHeight="17.0" prefWidth="39.0" text="not" />
+    <Button fx:id="repeatButton" font="$x2" layoutX="253.0" layoutY="100.0" minWidth="30.0" mnemonicParsing="false" onAction="#toggleRepeat" prefHeight="17.0" prefWidth="39.0" text="" />
     <Button fx:id="volumeMinusButton" layoutX="302.0" layoutY="100.0" minHeight="16.0" minWidth="20.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="26.0" text="-">
       <font>
         <Font size="8.0" fx:id="x1" />

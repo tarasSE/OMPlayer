@@ -1,10 +1,11 @@
 package com.omplayer.controller;
 
-import com.omplayer.parser.Item;
+import com.omplayer.model.Item;
 import com.omplayer.parser.MediaParser;
 import com.omplayer.player.Player;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -68,8 +69,9 @@ public class PlayerController implements Initializable {
     private ListView<Item> activeListView = itemsList;
 
     private MediaPlayer player;
+    private MediaParser parser = new MediaParser();
     private int currentIndex;
-    private Repeat repeatStatus = Repeat.NOT;
+    private Repeat repeatStatus = Repeat.ALL;
     private ChangeListener<Duration> progressChangeListener;
 
     enum Repeat {
@@ -92,6 +94,7 @@ public class PlayerController implements Initializable {
         initializeForward();
         initializeVolumeMinus();
         initializeVolumePlus();
+        initializeRepeat();
         initializeItemsList();
         initializeFavoriteItemsList();
         initializeAddToFavorites();
@@ -100,23 +103,45 @@ public class PlayerController implements Initializable {
 
     }
 
-
     @FXML
     private void initializeSearchField() {
         searchField.setOnAction(event -> {
-            MediaParser parser = new MediaParser();
             try {
-
-                List<Item> list = parser.getMP3(
-                        "http://mp3.cc/search/f/" + URLEncoder.encode(searchField.getText().trim(), "UTF-8"))
-                        .parallelStream().collect(Collectors.toList());
-                itemsList.setItems(FXCollections.observableArrayList(list));
-                System.out.println(searchField.getText());
+                searchFromMp3cc(
+                        "http://mp3.cc/search/f/" +
+                                URLEncoder.encode(searchField.getText().trim(), "UTF-8"));
+                itemsList.scrollTo(0);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
         });
     }
+
+    private void searchFromMp3cc(String searchRequest) {  // FIXME: 18.05.16 Bottleneck
+        ObservableList<Item> list = FXCollections.observableArrayList();
+
+        try {
+            list.addAll(parser.getMP3(searchRequest)
+                    .parallelStream().collect(Collectors.toList()));
+            itemsList.setItems(list);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int i = 2;
+        while (true) {
+            try {
+                list.addAll(
+                        parser.getMP3(
+                                searchRequest + "/page/" + i++ + "/")
+                                .parallelStream().collect(Collectors.toList()
+                        ));
+            } catch (IOException e) {
+                break;
+            }
+        }
+    }
+
 
 //    private void initializeInfoLabel() {
 //        String text = itemsList.getSelectionModel().getSelectedResultItem().getShortName();
@@ -184,6 +209,12 @@ public class PlayerController implements Initializable {
         volumePlusButton.setOnAction(actionEvent -> volumeUp());
     }
 
+    private void initializeRepeat() {
+        toggleRepeat();
+        setRepeatStatus(Repeat.ALL);
+
+    }
+
 //    private void initializeVolumeSlider() {
 //        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
 //            player.setVolume((Double) newValue);
@@ -197,19 +228,21 @@ public class PlayerController implements Initializable {
             int i = repeatStatus.ordinal() + 1;
             switch (i % 3 == 0 ? i = 0 : i) {
                 case 1:
-                    repeatButton.setText("one");
                     setRepeatStatus(Repeat.ONE);
                     break;
                 case 2:
-                    repeatButton.setText("all");
                     setRepeatStatus(Repeat.ALL);
                     break;
                 default:
-                    repeatButton.setText("not");
                     setRepeatStatus(Repeat.NOT);
             }
 
         });
+    }
+
+    private void setRepeatStatus(Repeat status) {
+        this.repeatStatus = status;
+        this.repeatButton.setText(repeatStatus.name());
     }
 
     private void initializeItemsList() {
@@ -370,6 +403,8 @@ public class PlayerController implements Initializable {
         if (currentIndex + i >= 0) {
             setCurrentIndex(currentIndex + i);
         }
+
+        if (activeListView == null) return;
 
         int activeListSize = activeListView.getItems().size();
 

@@ -1,6 +1,8 @@
 package com.omplayer.parser;
 
 
+import com.omplayer.model.Item;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,24 +16,24 @@ public class MediaParser {
     private Pattern imgPattern;
     private Pattern mp3Pattern;
 
-    public Set<Item> getIMG(final String address) {
+    public Set<Item> getIMG(final String address) throws IOException {
         return getSMTH(address, getIMGPattern());
     }
 
-    public void downloadIMG(String address) {
+    public void downloadIMG(String address) throws IOException {
         downloadSMTH(address, getIMGPattern(), "pictures");
     }
 
-    public Set<Item> getMP3(final String address) {
+    public Set<Item> getMP3(final String address) throws IOException {
 
         return getSMTH(address, getMP3Pattern());
     }
 
-    public void downloadMP3(String address) {
+    public void downloadMP3(String address) throws IOException {
         downloadSMTH(address, getMP3Pattern(), "mp3");
     }
 
-    public Set<Item> getSMTH(final String address, final Pattern pattern) {
+    public Set<Item> getSMTH(final String address, final Pattern pattern) throws IOException {
         Set<Item> smth = new TreeSet<>();
         URL url = null;
 
@@ -45,7 +47,7 @@ public class MediaParser {
             throw new RuntimeException("Something wrong with URL. Please recheck it and try later.");
         }
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 
             reader.lines().forEach(x -> {
                 Matcher matcher = pattern.matcher(x);
@@ -58,15 +60,12 @@ public class MediaParser {
                     smth.add(item);
                 }
             });
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        reader.close();
 
         return smth;
     }
 
-    public void downloadSMTH(String address, Pattern pattern, String itemsType) {
+    public void downloadSMTH(String address, Pattern pattern, String itemsType) throws IOException {
         getSMTH(address, pattern).forEach(x -> {
             try {
                 InputStream is = new URL(x.getUrl()).openStream();

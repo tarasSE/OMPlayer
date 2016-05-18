@@ -1,10 +1,10 @@
-package com.omplayer.parser;
+package com.omplayer.model;
 
 import lombok.Data;
-
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode
 public class Item implements Comparable<Item>{
     private String url;
     private String shortName;
@@ -31,24 +31,5 @@ public class Item implements Comparable<Item>{
     @Override
     public int compareTo(Item o) {
         return getShortName().compareTo(o.getShortName());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Item item = (Item) o;
-
-        if (!url.equals(item.url)) return false;
-        return shortName.equals(item.shortName);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = url.hashCode();
-        result = 31 * result + shortName.hashCode() + LocalDateTime.now().hashCode();
-        return result;
     }
 }
