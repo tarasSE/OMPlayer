@@ -1,30 +1,28 @@
 package com.omplayer.controller;
 
 import com.omplayer.model.Item;
-import com.omplayer.parser.MediaParser;
-import com.omplayer.player.Player;
+import com.omplayer.player.MainApp;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.media.Media;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 import lombok.Data;
 
-import java.io.*;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
+
 
 @Data
 public class PlayerController implements Initializable {
-    //    private Scene scene;
+    public Font x1;
+    public Font x2;
+    private MainApp mainApp;
+    @FXML
+    private AnchorPane playerAnchorPane;
     @FXML
     private Button playPauseButton;
     @FXML
@@ -44,33 +42,16 @@ public class PlayerController implements Initializable {
     @FXML
     private Button repeatButton;
     @FXML
-    private Button addToFavorites;
-    @FXML
-    private Button removeFromFavoritesButton;
-    @FXML
-    private Button clearResultButton;
-    @FXML
     private ProgressBar timeProgressBar;
     @FXML
     private Slider volumeSlider;
-    @FXML
-    private TextField searchField;
     @FXML
     private Label infoLabel;
     @FXML
     private Label currentTimeLabel;
     @FXML
     private Label totalTimeLabel;
-    @FXML
-    private ListView<Item> itemsList;
-    @FXML
-    private ListView<Item> favoriteItemsListView;
 
-    private ListView<Item> activeListView = itemsList;
-
-    private MediaPlayer player;
-    private MediaParser parser = new MediaParser();
-    private int currentIndex;
     private Repeat repeatStatus = Repeat.ALL;
     private ChangeListener<Duration> progressChangeListener;
 
@@ -80,14 +61,7 @@ public class PlayerController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        assert playPauseButton != null : "fx:id=\"playPauseButton\" was not injected: check your FXML file 'player.fxml'.";
-        assert stopButton != null : "fx:id=\"stopButton\" was not injected: check your FXML file 'player.fxml'.";
-        assert backButton != null : "fx:id=\"backButton\" was not injected: check your FXML file 'player.fxml'.";
-        assert forwardButton != null : "fx:id=\"forwardButton \" was not injected: check your FXML file 'player.fxml'.";
-        assert timeProgressBar != null : "fx:id=\"timeSlider\" was not injected: check your FXML file 'player.fxml'.";
-
-//        this.scene = Player.getPrimaryStage().getScene();
-        this.player = Player.getPlayer();
+        initializeAnchors();
         initializePlayPause();
         initializeStop();
         initializeBack();
@@ -95,67 +69,24 @@ public class PlayerController implements Initializable {
         initializeVolumeMinus();
         initializeVolumePlus();
         initializeRepeat();
-        initializeItemsList();
-        initializeFavoriteItemsList();
-        initializeAddToFavorites();
-        initializeRemoveFromFavorites();
-        initializeSearchField();
 
     }
 
-    @FXML
-    private void initializeSearchField() {
-        searchField.setOnAction(event -> {
-            try {
-                searchFromMp3cc(
-                        "http://mp3.cc/search/f/" +
-                                URLEncoder.encode(searchField.getText().trim(), "UTF-8"));
-                itemsList.scrollTo(0);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        });
+    private void initializeAnchors() {
+        AnchorPane.setTopAnchor(getPlayerAnchorPane(), 0.0);
+        AnchorPane.setLeftAnchor(getPlayerAnchorPane(), 0.0);
+        AnchorPane.setRightAnchor(getPlayerAnchorPane(), 0.0);
+
     }
-
-    private void searchFromMp3cc(String searchRequest) {  // FIXME: 18.05.16 Bottleneck
-        ObservableList<Item> list = FXCollections.observableArrayList();
-
-        try {
-            list.addAll(parser.getMP3(searchRequest)
-                    .parallelStream().collect(Collectors.toList()));
-            itemsList.setItems(list);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int i = 2;
-        while (true) {
-            try {
-                list.addAll(
-                        parser.getMP3(
-                                searchRequest + "/page/" + i++ + "/")
-                                .parallelStream().collect(Collectors.toList()
-                        ));
-            } catch (IOException e) {
-                break;
-            }
-        }
-    }
-
-
-//    private void initializeInfoLabel() {
-//        String text = itemsList.getSelectionModel().getSelectedResultItem().getShortName();
-//        infoLabel.setText(text);
-//    }
 
     private void initializePlayPause() {
 
         playPauseButton.setOnAction(actionEvent -> {
-            MediaPlayer.Status status = player.statusProperty().getValue();
+            MediaPlayer.Status status = getPlayer().statusProperty().getValue();
 
-            if (itemsList.getItems() == null ||
-                    itemsList.getItems().size() == 0) {
-                setActiveListView(favoriteItemsListView);
+            if (getSearchItemsList().getItems() == null ||
+                    getSearchItemsList().getItems().size() == 0) {
+                setActiveListView(getFavoriteItemsListView());
             }
 
             if (status == null) {
@@ -164,7 +95,7 @@ public class PlayerController implements Initializable {
                 return;
             }
             if (status.equals(MediaPlayer.Status.PLAYING)) {
-                player.pause();
+                getPlayer().pause();
                 return;
             }
 
@@ -179,26 +110,16 @@ public class PlayerController implements Initializable {
         });
     }
 
-    @FXML
-    private void playPreviousItem() {
-        playItemOnStep(-1);
-    }
-
-    @FXML
-    private void playNextItem() {
-        playItemOnStep(1);
-    }
-
     private void initializeStop() {
         stopButton.setOnAction(actionEvent -> stop());
     }
 
     private void initializeBack() {
-        backButton.setOnAction(actionEvent -> player.seek(player.getCurrentTime().subtract(Duration.seconds(5))));
+        backButton.setOnAction(actionEvent -> getPlayer().seek(getPlayer().getCurrentTime().subtract(Duration.seconds(5))));
     }
 
     private void initializeForward() {
-        forwardButton.setOnAction(actionEvent -> player.seek(player.getCurrentTime().add(Duration.seconds(5))));
+        forwardButton.setOnAction(actionEvent -> getPlayer().seek(getPlayer().getCurrentTime().add(Duration.seconds(5))));
     }
 
     private void initializeVolumeMinus() {
@@ -214,13 +135,6 @@ public class PlayerController implements Initializable {
         setRepeatStatus(Repeat.ALL);
 
     }
-
-//    private void initializeVolumeSlider() {
-//        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-//            player.setVolume((Double) newValue);
-//        });
-////        volumeSlider.setOnScroll(event -> );
-//    }
 
     @FXML
     private void toggleRepeat() {
@@ -240,186 +154,68 @@ public class PlayerController implements Initializable {
         });
     }
 
-    private void setRepeatStatus(Repeat status) {
-        this.repeatStatus = status;
-        this.repeatButton.setText(repeatStatus.name());
-    }
-
-    private void initializeItemsList() {
-        itemsList.setOnMouseClicked(event -> twoClickPlay(event, itemsList));
-//        itemsList.setCellFactory(lv -> {
-//
-//            ListCell<Item> cell = new ListCell<>();
-//
-//            ContextMenu contextMenu = new ContextMenu();
-//
-//
-//            MenuItem editItem = new MenuItem();
-//            editItem.textProperty().bind(Bindings.format("Edit \"%s\"", cell.itemProperty()));
-//            editItem.setOnAction(event -> {
-//                Item item = cell.getItem();
-//                // code to edit item...
-//            });
-//            MenuItem deleteItem = new MenuItem();
-//            deleteItem.textProperty().bind(Bindings.format("Delete \"%s\"", cell.itemProperty()));
-//            deleteItem.setOnAction(event -> itemsList.getItems().remove(cell.getItem()));
-//            contextMenu.getItems().addAll(editItem, deleteItem);
-//
-//            cell.textProperty().bind(cell.itemProperty());
-//
-//            cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
-//                if (isNowEmpty) {
-//                    cell.setContextMenu(null);
-//                } else {
-//                    cell.setContextMenu(contextMenu);
-//                }
-//            });
-//            return cell ;
-//        });
-    }
-
-    private void initializeFavoriteItemsList() {
-        //load favorites.list
-        File file = new File("./favorites.list");
-        File fileBk = new File("./favorites.list.bk");
-        if (!file.exists()) {
-            if (fileBk.exists()) {
-                fileBk.renameTo(file);
-
-            } else {
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        try (
-                InputStream is = new FileInputStream(file);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-
-            List<Item> list = reader.lines().map(Item::getInstance).collect(Collectors.toList());
-            favoriteItemsListView.setItems(FXCollections.observableArrayList(list));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        favoriteItemsListView.setOnMouseClicked(event -> twoClickPlay(event, favoriteItemsListView));
-    }
-
-    private void initializeAddToFavorites() {
-
-        addToFavorites.setOnAction(event -> {
-
-            Item item = getFocusedItem(itemsList);
-            getFavoritesList().add(item);
-
-            refreshFavoritesList();
-        });
-    }
-
-    private void initializeRemoveFromFavorites() {
-        removeFromFavoritesButton.setOnAction(event -> {
-            getFavoritesList().remove(getFocusedItem(favoriteItemsListView));
-
-            refreshFavoritesList();
-        });
-    }
-
-    private List<Item> getFavoritesList() {
-        return favoriteItemsListView.getItems();
-    }
-
-    private void refreshFavoritesList() {
-        List<Item> items = favoriteItemsListView.getItems();
-        File file = new File("./favorites.list");
-        File fileBk = new File("./favorites.list.bk");
-        file.renameTo(fileBk);
-
-        try (FileWriter printWriter = new FileWriter(new File("./favorites.list"))) {
-            items.forEach(x -> {
-                try {
-                    printWriter.append(x.getUrl()).append("\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-            fileBk.delete();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void twoClickPlay(MouseEvent event, ListView<Item> list) {
-        if (event.getClickCount() == 2) {
-            Item item = list.getSelectionModel().getSelectedItem();
-            setCurrentIndex(list.getSelectionModel().getSelectedIndex());
-
-            if (player != null) {
-                player.stop();
-            }
-
-            player = getPlayerInstance(item.getUrl());
-            setActiveListView(list);
-            play();
-        }
-    }
-
-    private void play() {
-        MediaPlayer.Status status = player.getStatus();
+    public void play() {
+        MediaPlayer.Status status = getPlayer().getStatus();
         if (!status.equals(MediaPlayer.Status.PAUSED)) {
-            setCurrentlyPlaying(player);
+            setCurrentlyPlaying(getPlayer());
         }
-        player.play();
-        player.totalDurationProperty().addListener(observable -> {
+        getPlayer().play();
+        getPlayer().totalDurationProperty().addListener(observable -> {
             getTotalTimeLabel().setText(totalTimeToString());
         });
-        player.setOnEndOfMedia(() -> {
+        getPlayer().setOnEndOfMedia(() -> {
             if (repeatStatus.equals(Repeat.ONE)) {
-                player.seek(Duration.ZERO);
+                getPlayer().seek(Duration.ZERO);
                 return;
             }
             playNextItem();
         });
     }
 
-    private void stop() {
-        player.stop();
-        player.seek(Duration.ZERO);
+    public void stop() {
+        getPlayer().stop();
+        getPlayer().seek(Duration.ZERO);
     }
 
     private void volumeDown() {
-        player.setVolume(player.getVolume() - 0.05);
+        getPlayer().setVolume(getPlayer().getVolume() - 0.05);
     }
 
     private void volumeUp() {
-        player.setVolume(player.getVolume() + 0.05);
+        getPlayer().setVolume(getPlayer().getVolume() + 0.05);
+    }
+
+    @FXML
+    private void playPreviousItem() {
+        playItemOnStep(-1);
+    }
+
+    @FXML
+    private void playNextItem() {
+        playItemOnStep(1);
     }
 
     private void playItemOnStep(final int i) {
-        if (currentIndex + i >= 0) {
-            setCurrentIndex(currentIndex + i);
+        if (getCurrentIndex() + i >= 0) {
+            setCurrentIndex(getCurrentIndex() + i);
         }
 
-        if (activeListView == null) return;
+        if (getActiveListView() == null) return;
 
-        int activeListSize = activeListView.getItems().size();
+        int activeListSize = getActiveListView().getItems().size();
 
-        if (currentIndex < 0 || currentIndex >= activeListSize) {
+        if (getCurrentIndex() < 0 || getCurrentIndex() >= activeListSize) {
             switch (repeatStatus) {
                 case ONE:
                 case NOT: {
                     setCurrentIndex(0);
-                    activeListView.getSelectionModel().select(0);
+                    getActiveListView().getSelectionModel().select(0);
                     stop();
                     infoLabel.setText("-=-");
                     return;
                 }
                 case ALL: {
-                    if (currentIndex < 0) {
+                    if (getCurrentIndex() < 0) {
                         setCurrentIndex(activeListSize);
                         break;
                     }
@@ -430,17 +226,30 @@ public class PlayerController implements Initializable {
             }
         }
 
-        activeListView.getSelectionModel().select(currentIndex);
-        Item item = getSelectedItem(activeListView);
+        getActiveListView().getSelectionModel().select(getCurrentIndex());
+        Item item = getSelectedItem(getActiveListView());
         if (item == null) return;
-        player.stop();
-        player = getPlayerInstance(item.getUrl());
+        getPlayer().stop();
+        setPlayer(getPlayerInstance(item.getUrl()));
         play();
     }
 
-    @FXML
-    private void clearResult() {
-        itemsList.getItems().clear();
+    private String currentTimeToString() {
+        int curentTimeSeconds = (int) getPlayer().getCurrentTime().toSeconds();
+        int minutes = curentTimeSeconds / 60;
+        int seconds = curentTimeSeconds - minutes * 60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+
+    private String totalTimeToString() {
+        int totalTimeSeconds = (int) getPlayer().getTotalDuration().toSeconds();
+        int minutes = totalTimeSeconds / 60;
+        int seconds = totalTimeSeconds - minutes * 60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+
+    private MediaPlayer getPlayerInstance(String url) {
+        return mainApp.getPlayerInstance(url);
     }
 
     private Item getSelectedItem(final ListView<Item> listView) {
@@ -449,6 +258,26 @@ public class PlayerController implements Initializable {
 
     private Item getFocusedItem(final ListView<Item> listView) {
         return listView.getFocusModel().getFocusedItem();
+    }
+
+    private ListView<Item> getActiveListView() {
+        return mainApp.getActiveListView();
+    }
+
+    private ListView<Item> getSearchItemsList() {
+        return mainApp.getSearchItemsListView();
+    }
+
+    private ListView<Item> getFavoriteItemsListView() {
+        return mainApp.getFavoriteItemsListView();
+    }
+
+    private int getCurrentIndex() {
+        return mainApp.getCurrentIndex();
+    }
+
+    private MediaPlayer getPlayer() {
+        return mainApp.getPlayer();
     }
 
     private void setCurrentlyPlaying(final MediaPlayer player) {
@@ -469,24 +298,21 @@ public class PlayerController implements Initializable {
         infoLabel.setText(source);
     }
 
-    private String currentTimeToString() {
-        int curentTimeSeconds = (int) player.getCurrentTime().toSeconds();
-        int minutes = curentTimeSeconds / 60;
-        int seconds = curentTimeSeconds - minutes * 60;
-        return String.format("%02d:%02d", minutes, seconds);
+    private void setRepeatStatus(Repeat status) {
+        this.repeatStatus = status;
+        this.repeatButton.setText(repeatStatus.name());
     }
 
-    private String totalTimeToString() {
-        int totalTimeSeconds = (int) player.getTotalDuration().toSeconds();
-        int minutes = totalTimeSeconds / 60;
-        int seconds = totalTimeSeconds - minutes * 60;
-        return String.format("%02d:%02d", minutes, seconds);
+    private void setActiveListView(ListView<Item> activeListView) {
+        mainApp.setActiveListView(activeListView);
     }
 
-    private MediaPlayer getPlayerInstance(final String source) {
-        Media media = new Media(source);
-        MediaPlayer player = new MediaPlayer(media);
-        player.volumeProperty().bindBidirectional(volumeSlider.valueProperty());
-        return player;
+    private void setCurrentIndex(int currentIndex) {
+        mainApp.setCurrentIndex(currentIndex);
     }
+
+    public void setPlayer(MediaPlayer player) {
+        mainApp.setPlayer(player);
+    }
+
 }
