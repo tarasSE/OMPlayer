@@ -3,12 +3,13 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="playerAnchorPane" maxHeight="+Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mouseTransparent="false" prefHeight="100.0" prefWidth="450.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.omplayer.controller.PlayerController">
-  <AnchorPane prefHeight="22.0" prefWidth="430.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="45.0">
-    <ProgressBar fx:id="timeProgressBar" minHeight="5.0" prefHeight="22.0" prefWidth="430.0" progress="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+  <AnchorPane prefHeight="10.0" prefWidth="430.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="45.0">
+    <ProgressBar fx:id="timeProgressBar" minHeight="5.0" prefHeight="22.0" prefWidth="430.0" progress="0.0" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+    <ProgressBar fx:id="loadProgressBar" minHeight="5.0" opacity="0.28" prefHeight="22.0" prefWidth="430.0" progress="0.0" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
     <Label fx:id="currentTimeLabel" minHeight="14.0" prefHeight="14.0" prefWidth="39.0" text="00:00" textAlignment="CENTER" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="0.0">
       <font>
         <Font size="10.0" fx:id="x2" />
@@ -17,7 +18,7 @@
     <Label fx:id="totalTimeLabel" font="$x2" minHeight="14.0" prefHeight="14.0" text="00:00" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0" />
   </AnchorPane>
   <Label fx:id="infoLabel" alignment="TOP_LEFT" font="$x2" prefHeight="22.0" prefWidth="415.0" text="" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="22.0" minWidth="25.0" prefHeight="35.000099999997474" prefWidth="430.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="65.0">
+  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="22.0" minWidth="25.0" prefHeight="30.0" prefWidth="430.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="65.0">
     <!--<Slider fx:id="timeSlider" layoutX="17.0" layoutY="128.0" prefWidth="420.0" />-->
     <Button fx:id="prevItemButton" font="$x2" minWidth="30.0" mnemonicParsing="false" onAction="#playPreviousItem" prefHeight="15.0" prefWidth="40.0" text="◀▮" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
     <Button fx:id="backButton" font="$x2" minWidth="30.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="40.0" text="◀◀" AnchorPane.leftAnchor="42.0" AnchorPane.topAnchor="0.0" />
@@ -34,4 +35,7 @@
     <Slider fx:id="volumeSlider" blockIncrement="0.1" max="1.0" minHeight="6.0" prefHeight="15.0" prefWidth="80.0" value="1.0" AnchorPane.rightAnchor="27.0" AnchorPane.topAnchor="0.0" />
     <Button fx:id="volumePlusButton" font="$x1" minHeight="16.0" minWidth="24.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" text="+" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
   </AnchorPane>
+  <!--<AnchorPane fx:id="mediaAnchorPane" minWidth="297.0" prefHeight="162.0" prefWidth="297.0" visible="true" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="61.0" AnchorPane.topAnchor="95.0">-->
+  <!--<MediaView  fitHeight="134.0" fitWidth="134.0" preserveRatio="false" smooth="false" visible="true" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="76.0" AnchorPane.rightAnchor="87.0" AnchorPane.topAnchor="14.0" />-->
+  <!--</AnchorPane>-->
 </AnchorPane>

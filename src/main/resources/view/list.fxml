@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 
 <AnchorPane fx:id="listAnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="450.0" snapToPixel="true" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.omplayer.controller.ListController">
-  <TextField fx:id="searchField" editable="true" onAction="#initializeSearchField" opacity="1.0" prefWidth="415.0" promptText="search" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+  <TextField fx:id="searchField" editable="true" onAction="#initializeSearchField" opacity="1.0" prefWidth="415.0" promptText="search" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" focusTraversable="false"/>
   <TabPane fx:id="tabPane" prefHeight="309.0" prefWidth="415.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0">
     <Tab text="Results">
       <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="243.0" prefWidth="430.0">

@@ -6,9 +6,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 import lombok.Data;
 
@@ -18,9 +20,11 @@ import java.util.ResourceBundle;
 
 @Data
 public class PlayerController implements Initializable {
-    public Font x1;
-    public Font x2;
     private MainApp mainApp;
+//    @FXML
+//    private MediaView mediaView;
+//    @FXML
+//    private AnchorPane mediaAnchorPane;
     @FXML
     private AnchorPane playerAnchorPane;
     @FXML
@@ -44,6 +48,10 @@ public class PlayerController implements Initializable {
     @FXML
     private ProgressBar timeProgressBar;
     @FXML
+    private ProgressBar loadProgressBar;
+//    @FXML
+//    private Slider progressSlider;
+    @FXML
     private Slider volumeSlider;
     @FXML
     private Label infoLabel;
@@ -54,6 +62,7 @@ public class PlayerController implements Initializable {
 
     private Repeat repeatStatus = Repeat.ALL;
     private ChangeListener<Duration> progressChangeListener;
+    private ChangeListener<Duration> loadChangeListener;
 
     enum Repeat {
         NOT, ONE, ALL
@@ -62,6 +71,7 @@ public class PlayerController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeAnchors();
+//        initializeMediaView();
         initializePlayPause();
         initializeStop();
         initializeBack();
@@ -69,9 +79,21 @@ public class PlayerController implements Initializable {
         initializeVolumeMinus();
         initializeVolumePlus();
         initializeRepeat();
+//        initializeProgressBar();
 
-    }
 
+}
+
+//    private void initializeMediaView() {
+////        try {
+////            MediaPlayer player = getPlayerInstance(getClass().getResource("/smth.mp3").toURI().toString());
+////            setPlayer(player);
+//            setMediaView(new MediaView());
+////        } catch (URISyntaxException e) {
+////            e.printStackTrace();
+////        }
+//        getPlayerAnchorPane().getChildren().add(getMediaView());
+//    }
     private void initializeAnchors() {
         AnchorPane.setTopAnchor(getPlayerAnchorPane(), 0.0);
         AnchorPane.setLeftAnchor(getPlayerAnchorPane(), 0.0);
@@ -81,7 +103,7 @@ public class PlayerController implements Initializable {
 
     private void initializePlayPause() {
 
-        playPauseButton.setOnAction(actionEvent -> {
+        getPlayPauseButton().setOnAction(actionEvent -> {
             MediaPlayer.Status status = getPlayer().statusProperty().getValue();
 
             if (getSearchItemsList().getItems() == null ||
@@ -108,26 +130,74 @@ public class PlayerController implements Initializable {
             setCurrentIndex(-1);
             playNextItem();
         });
+
+    }
+
+    public void initializeAccelerators() {
+
+        addAccessorTo(
+                getPrevItemButton(),
+                KeyCodeCombination.valueOf("A"));
+
+        addAccessorTo(
+                getBackButton(),
+                KeyCodeCombination.valueOf("Q"));
+
+        addAccessorTo(
+                getPlayPauseButton(),
+                KeyCodeCombination.valueOf("W"));
+
+        addAccessorTo(
+                getStopButton(),
+                KeyCodeCombination.valueOf("S"));
+
+        addAccessorTo(
+                getForwardButton(),
+                KeyCodeCombination.valueOf("E"));
+
+        addAccessorTo(
+                getNextItemButton(),
+                KeyCodeCombination.valueOf("D"));
+
+        addAccessorTo(
+                getVolumeMinusButton(),
+                 KeyCodeCombination.valueOf("1"));
+
+        addAccessorTo(
+                getVolumePlusButton(),
+                KeyCodeCombination.valueOf("3"));
+
+        addAccessorTo(
+                getRepeatButton(),
+                KeyCodeCombination.valueOf("R"));
+
+        addAccessorTo(
+                getRepeatButton(),
+                KeyCodeCombination.valueOf("R"));
+    }
+
+    private void addAccessorTo(Button button, KeyCombination combination) {
+        button.getScene().getAccelerators().put(combination, button::fire);
     }
 
     private void initializeStop() {
-        stopButton.setOnAction(actionEvent -> stop());
+        getStopButton().setOnAction(actionEvent -> stop());
     }
 
     private void initializeBack() {
-        backButton.setOnAction(actionEvent -> getPlayer().seek(getPlayer().getCurrentTime().subtract(Duration.seconds(5))));
+        getBackButton().setOnAction(actionEvent -> getPlayer().seek(getPlayer().getCurrentTime().subtract(Duration.seconds(5))));
     }
 
     private void initializeForward() {
-        forwardButton.setOnAction(actionEvent -> getPlayer().seek(getPlayer().getCurrentTime().add(Duration.seconds(5))));
+        getForwardButton().setOnAction(actionEvent -> getPlayer().seek(getPlayer().getCurrentTime().add(Duration.seconds(5))));
     }
 
     private void initializeVolumeMinus() {
-        volumeMinusButton.setOnAction(event -> volumeDown());
+        getVolumeMinusButton().setOnAction(event -> volumeDown());
     }
 
     private void initializeVolumePlus() {
-        volumePlusButton.setOnAction(actionEvent -> volumeUp());
+        getVolumePlusButton().setOnAction(actionEvent -> volumeUp());
     }
 
     private void initializeRepeat() {
@@ -135,11 +205,20 @@ public class PlayerController implements Initializable {
         setRepeatStatus(Repeat.ALL);
 
     }
+    private void initializeProgressBar(){
+//        getProgressSlider().valueProperty().addListener(new ChangeListener<Number>() {
+//            public void changed(ObservableValue<? extends Number> ov,
+//                                Number old_val, Number new_val) {
+//                getTimeProgressBar().setProgress(new_val.doubleValue() / 100);
+//            }
+//        });
+
+    }
 
     @FXML
     private void toggleRepeat() {
-        repeatButton.setOnAction(event -> {
-            int i = repeatStatus.ordinal() + 1;
+        getRepeatButton().setOnAction(event -> {
+            int i = getRepeatStatus().ordinal() + 1;
             switch (i % 3 == 0 ? i = 0 : i) {
                 case 1:
                     setRepeatStatus(Repeat.ONE);
@@ -164,7 +243,7 @@ public class PlayerController implements Initializable {
             getTotalTimeLabel().setText(totalTimeToString());
         });
         getPlayer().setOnEndOfMedia(() -> {
-            if (repeatStatus.equals(Repeat.ONE)) {
+            if (getRepeatStatus().equals(Repeat.ONE)) {
                 getPlayer().seek(Duration.ZERO);
                 return;
             }
@@ -205,13 +284,13 @@ public class PlayerController implements Initializable {
         int activeListSize = getActiveListView().getItems().size();
 
         if (getCurrentIndex() < 0 || getCurrentIndex() >= activeListSize) {
-            switch (repeatStatus) {
+            switch (getRepeatStatus()) {
                 case ONE:
                 case NOT: {
                     setCurrentIndex(0);
                     getActiveListView().getSelectionModel().select(0);
                     stop();
-                    infoLabel.setText("-=-");
+                    getInfoLabel().setText("-=-");
                     return;
                 }
                 case ALL: {
@@ -248,8 +327,18 @@ public class PlayerController implements Initializable {
         return String.format("%02d:%02d", minutes, seconds);
     }
 
-    private MediaPlayer getPlayerInstance(String url) {
-        return mainApp.getPlayerInstance(url);
+    public MediaPlayer getPlayerInstance(final String url) {
+        Media media = new Media(url);
+        MediaPlayer player = new MediaPlayer(media);
+        player.volumeProperty().bindBidirectional(getVolumeSlider().valueProperty());
+//        setMediaView(new MediaView(player));
+//        player.setOnReady(() -> {
+//            mainApp.getPrimaryStage().setMinHeight(player.getMedia().getHeight());
+//            mainApp.getPrimaryStage().setMinWidth(player.getMedia().getWidth());
+//        });
+//
+//        mediaAnchorPane.getChildren().add(getMediaView());
+        return player;
     }
 
     private Item getSelectedItem(final ListView<Item> listView) {
@@ -261,58 +350,71 @@ public class PlayerController implements Initializable {
     }
 
     private ListView<Item> getActiveListView() {
-        return mainApp.getActiveListView();
+        return getMainApp().getActiveListView();
     }
 
     private ListView<Item> getSearchItemsList() {
-        return mainApp.getSearchItemsListView();
+        return getMainApp().getSearchItemsListView();
     }
 
     private ListView<Item> getFavoriteItemsListView() {
-        return mainApp.getFavoriteItemsListView();
+        return getMainApp().getFavoriteItemsListView();
     }
 
     private int getCurrentIndex() {
-        return mainApp.getCurrentIndex();
+        return getMainApp().getCurrentIndex();
     }
 
     private MediaPlayer getPlayer() {
-        return mainApp.getPlayer();
+        return getMainApp().getPlayer();
     }
 
     private void setCurrentlyPlaying(final MediaPlayer player) {
         player.seek(Duration.ZERO);
 
-        timeProgressBar.setProgress(0);
-        progressChangeListener = (observableValue, oldValue, newValue) -> {
-            timeProgressBar.setProgress(1.0 * player.getCurrentTime().toMillis() / player.getTotalDuration().toMillis());
+        getTimeProgressBar().setProgress(0);
+
+        setProgressChangeListener(
+                (observableValue, oldValue, newValue) -> {
+            getTimeProgressBar().setProgress(1.0 * player.getCurrentTime().toMillis() / player.getTotalDuration().toMillis());
 
             getCurrentTimeLabel().setText(currentTimeToString());
-        };
+        });
 
-        player.currentTimeProperty().addListener(progressChangeListener);
+        player.currentTimeProperty().addListener(getProgressChangeListener());
+        setCurrentlyLoading(player);
 
         String source = player.getMedia().getSource();
         source = source.substring(0, source.length() - 4);
         source = source.substring(source.lastIndexOf("/") + 1).replaceAll("%20", " ");
-        infoLabel.setText(source);
+        getInfoLabel().setText(source);
     }
 
-    private void setRepeatStatus(Repeat status) {
+    private void setCurrentlyLoading(final MediaPlayer player){
+        getLoadProgressBar().setProgress(0);
+        setLoadChangeListener(
+                (observableValue, oldValue, newValue) -> {
+                    getLoadProgressBar().setProgress(1.0 * player.getBufferProgressTime().toMillis() / player.getTotalDuration().toMillis());
+                });
+
+        player.bufferProgressTimeProperty().addListener(getLoadChangeListener());
+    }
+
+    private void setRepeatStatus(final Repeat status) {
         this.repeatStatus = status;
-        this.repeatButton.setText(repeatStatus.name());
+        getRepeatButton().setText(getRepeatStatus().name());
     }
 
-    private void setActiveListView(ListView<Item> activeListView) {
-        mainApp.setActiveListView(activeListView);
+    private void setActiveListView(final ListView<Item> activeListView) {
+        getMainApp().setActiveListView(activeListView);
     }
 
-    private void setCurrentIndex(int currentIndex) {
-        mainApp.setCurrentIndex(currentIndex);
+    private void setCurrentIndex(final int currentIndex) {
+        getMainApp().setCurrentIndex(currentIndex);
     }
 
-    public void setPlayer(MediaPlayer player) {
-        mainApp.setPlayer(player);
+    public void setPlayer(final MediaPlayer player) {
+        getMainApp().setPlayer(player);
     }
 
 }

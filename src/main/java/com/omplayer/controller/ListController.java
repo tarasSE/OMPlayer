@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.MediaPlayer;
@@ -56,7 +57,21 @@ public class ListController implements Initializable {
         initializeRemoveFromFavorites();
     }
 
-    private void initializeAnchors(){
+    public void initializeAccelerators() {
+
+//        addAccessorTo(
+//                getPrevItemButton(),
+//                KeyCodeCombination.valueOf("A"));
+//        addAccessorTo( getAddToFavorites(), KeyCodeCombination.valueOf("Ctrl+A"));
+        getSearchField().getScene().getAccelerators().put(KeyCombination.valueOf("Ctrl+F"), () -> getSearchField().requestFocus());
+    }
+
+    private void addAccessorTo(Button button, KeyCombination combination) {
+        if(button.getScene() == null) System.out.println("NULL");
+        button.getScene().getAccelerators().put(combination, button::fire);
+    }
+
+    private void initializeAnchors() {
         AnchorPane.setTopAnchor(getListAnchorPane(), 100.0);
         AnchorPane.setBottomAnchor(getListAnchorPane(), 0.0);
         AnchorPane.setLeftAnchor(getListAnchorPane(), 0.0);
@@ -66,21 +81,22 @@ public class ListController implements Initializable {
 
     @FXML
     private void initializeSearchField() {
-        searchField.setOnAction(event -> {
+        getSearchField().setOnAction(event -> {
             try {
                 searchFromMp3cc(
                         "http://mp3.cc/search/f/" +
-                                URLEncoder.encode(searchField.getText().trim(), "UTF-8"));
-                searchItemsListView.scrollTo(0);
+                                URLEncoder.encode(getSearchField().getText().trim(), "UTF-8"));
+                getSearchItemsListView().scrollTo(0);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+            setActiveListView(getSearchItemsListView());
         });
     }
 
     private void initializeSearchItemsList() {
-        searchItemsListView.setItems(FXCollections.emptyObservableList());
-        searchItemsListView.setOnMouseClicked(event -> twoClickPlay(event, searchItemsListView));
+        getSearchItemsListView().setItems(FXCollections.emptyObservableList());
+        getSearchItemsListView().setOnMouseClicked(event -> twoClickPlay(event, getSearchItemsListView()));
 //        searchItemsListView.setCellFactory(lv -> {
 //
 //            ListCell<Item> cell = new ListCell<>();
@@ -133,20 +149,20 @@ public class ListController implements Initializable {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
 
             List<Item> list = reader.lines().map(Item::getInstance).collect(Collectors.toList());
-            favoriteItemsListView.setItems(FXCollections.observableArrayList(list));
+            getFavoriteItemsListView().setItems(FXCollections.observableArrayList(list));
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        favoriteItemsListView.setOnMouseClicked(event -> twoClickPlay(event, favoriteItemsListView));
+        getFavoriteItemsListView().setOnMouseClicked(event -> twoClickPlay(event, getFavoriteItemsListView()));
     }
 
     private void initializeAddToFavorites() {
 
-        addToFavorites.setOnAction(event -> {
+        getAddToFavorites().setOnAction(event -> {
 
-            Item item = getFocusedItem(searchItemsListView);
+            Item item = getFocusedItem(getSearchItemsListView());
             getFavoritesList().add(item);
 
             refreshFavoritesList();
@@ -154,14 +170,14 @@ public class ListController implements Initializable {
     }
 
     private void initializeRemoveFromFavorites() {
-        removeFromFavoritesButton.setOnAction(event -> {
-            getFavoritesList().remove(getFocusedItem(favoriteItemsListView));
+        getRemoveFromFavoritesButton().setOnAction(event -> {
+            getFavoritesList().remove(getFocusedItem(getFavoriteItemsListView()));
 
             refreshFavoritesList();
         });
     }
 
-    private void searchFromMp3cc(String searchRequest) {  // FIXME: 18.05.16 Bottleneck
+    private void searchFromMp3cc(final String searchRequest) {  // FIXME: 18.05.16 Bottleneck
         ObservableList<Item> list = FXCollections.observableArrayList();
 
         try {
@@ -188,11 +204,11 @@ public class ListController implements Initializable {
 
     @FXML
     private void clearResult() {
-        searchItemsListView.getItems().clear();
+        getSearchItemsListView().getItems().clear();
     }
 
     private void refreshFavoritesList() {
-        List<Item> items = favoriteItemsListView.getItems();
+        List<Item> items = getFavoriteItemsListView().getItems();
         File file = new File("./favorites.list");
         File fileBk = new File("./favorites.list.bk");
         file.renameTo(fileBk);
@@ -213,7 +229,7 @@ public class ListController implements Initializable {
         }
     }
 
-    private void twoClickPlay(MouseEvent event, ListView<Item> list) {
+    private void twoClickPlay(final MouseEvent event, final ListView<Item> list) {
         if (event.getClickCount() == 2) {
             Item item = list.getSelectionModel().getSelectedItem();
             setCurrentIndex(list.getSelectionModel().getSelectedIndex());
@@ -229,19 +245,19 @@ public class ListController implements Initializable {
     }
 
     private void play() {
-        mainApp.play();
+        getMainApp().play();
     }
 
     private void stop() {
-        mainApp.stop();
+        getMainApp().stop();
     }
 
     private List<Item> getFavoritesList() {
-        return favoriteItemsListView.getItems();
+        return getFavoriteItemsListView().getItems();
     }
 
-    private MediaPlayer getPlayerInstance(String url) {
-        return mainApp.getPlayerInstance(url);
+    private MediaPlayer getPlayerInstance(final String url) {
+        return getMainApp().getPlayerInstance(url);
     }
 
     private Item getSelectedItem(final ListView<Item> listView) {
@@ -253,22 +269,22 @@ public class ListController implements Initializable {
     }
 
     private int getCurrentIndex() {
-        return mainApp.getCurrentIndex();
+        return getMainApp().getCurrentIndex();
     }
 
     public MediaPlayer getPlayer() {
-        return mainApp.getPlayer();
+        return getMainApp().getPlayer();
     }
 
     private void setCurrentIndex(int currentIndex) {
-        mainApp.setCurrentIndex(currentIndex);
+        getMainApp().setCurrentIndex(currentIndex);
     }
 
-    public void setActiveListView(ListView<Item> activeListView) {
-        mainApp.setActiveListView(activeListView);
+    public void setActiveListView(final ListView<Item> activeListView) {
+        getMainApp().setActiveListView(activeListView);
     }
 
-    public void setPlayer(MediaPlayer player) {
-        mainApp.setPlayer(player);
+    public void setPlayer(final MediaPlayer player) {
+        getMainApp().setPlayer(player);
     }
 }

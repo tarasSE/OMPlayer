@@ -8,19 +8,21 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@ToString(exclude = {"playerController", "listController"})
 public class MainApp extends Application {
     private Stage primaryStage;
     private AnchorPane rootLayout;
@@ -41,19 +43,22 @@ public class MainApp extends Application {
         setPrimaryStage(primaryStage);
         initRootLayout(primaryStage);
         initializeMediaView();
-        showPlayer();
+
         showList();
+        showPlayer();
+        initializeAllAccelerators();
+
     }
 
     private void initializeMediaView() {
-        Media pick = null;
         try {
-            pick = new Media(getClass().getResource("/smth.mp3").toURI().toString());
+            MediaPlayer player = getPlayerInstance(getClass().getResource("/smth.mp3").toURI().toString());
+            setPlayer(player);
+            setMediaView(new MediaView(getPlayer()));
         } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        setPlayer(new MediaPlayer(pick));
-        setMediaView(new MediaView(getPlayer()));
+        e.printStackTrace();
+    }
+        getRootLayout().getChildren().add(getMediaView());
     }
 
     private void showPlayer() {
@@ -95,6 +100,11 @@ public class MainApp extends Application {
             setRootLayout(loader.load());
 
             Scene scene = new Scene(getRootLayout());
+            scene.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE){
+                    getRootLayout().requestFocus();
+                }
+            });
             primaryStage.setTitle("OMPlayer");
             primaryStage.setMinHeight(500);
             primaryStage.setMinWidth(450);
@@ -107,15 +117,17 @@ public class MainApp extends Application {
             e.printStackTrace();
         }
     }
+    private void initializeAllAccelerators(){
+        getPlayerController().initializeAccelerators();
+        getListController().initializeAccelerators();
+    }
 
     public static void main(String[] args) {
         launch(args);
     }
 
     public MediaPlayer getPlayerInstance(final String source) {
-        Media media = new Media(source);
-//        player.volumeProperty().bindBidirectional(volumeSlider.valueProperty());
-        return new MediaPlayer(media);
+        return getPlayerController().getPlayerInstance(source);
     }
 
     public ListView<Item> getSearchItemsListView(){
